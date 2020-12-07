@@ -6,6 +6,7 @@
       @blur="validateEmail"
       @input="updateValue"
       :class="{ 'is-invalid': inputRef.error }"
+      :="$attrs"
     />
     <span v-if="inputRef.error" class="invalid-feedback">
       {{ inputRef.errorMessage }}
@@ -17,7 +18,7 @@
 import { defineComponent, PropType, reactive } from "vue";
 
 interface RuleProp {
-  type: "required" | "email";
+  type: "required" | "email" | "password";
   errorMessage: string;
 }
 export type RuleProps = RuleProp[];
@@ -29,6 +30,7 @@ export default defineComponent({
     },
     modelValue: String,
   },
+  inheritAttrs: false,
   setup(props, context) {
     const emailReg = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
     const inputRef = reactive({
@@ -49,6 +51,10 @@ export default defineComponent({
             case "email":
               inputRef.errorMessage = rule.errorMessage;
               passed = emailReg.test(inputRef.val);
+              break;
+            case "password":
+              passed = inputRef.val.length > 6;
+              inputRef.errorMessage = rule.errorMessage;
               break;
             default:
               break;

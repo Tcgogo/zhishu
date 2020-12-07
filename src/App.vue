@@ -5,16 +5,21 @@
     <form>
       <div class="mb-3">
         <label for="exampleInputEmail1" class="form-label">账号</label>
-        <validate-input :rules="emailRules" v-model="emailVal"></validate-input>
-        {{ emailVal }}
+        <validate-input
+          :rules="emailRules"
+          v-model="emailVal"
+          type="text"
+          placeholder="请输入邮箱地址"
+        ></validate-input>
       </div>
       <div class="mb-3">
         <label for="exampleInputPassword1" class="form-label">密码</label>
-        <input
+        <validate-input
+          :rules="passwordRules"
+          v-model="emailVal"
           type="password"
-          class="form-control"
-          id="exampleInputPassword1"
-        />
+          placeholder="请输入密码"
+        ></validate-input>
       </div>
     </form>
   </div>
@@ -79,10 +84,13 @@ export default defineComponent({
   },
   setup() {
     const emailVal = ref("tcgogo");
-
     const emailRules: RuleProps = [
       { type: "required", errorMessage: "电子邮箱地址不能为空！" },
       { type: "email", errorMessage: "请输入正确的电子邮箱格式！" },
+    ];
+    const passwordRules: RuleProps = [
+      { type: "required", errorMessage: "密码不能为空！" },
+      { type: "password", errorMessage: "密码不能小于6位数" },
     ];
 
     return {
@@ -90,6 +98,7 @@ export default defineComponent({
       currentUser,
       emailRules,
       emailVal,
+      passwordRules
     };
   },
 });
