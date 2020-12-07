@@ -2,8 +2,9 @@
   <div class="validata-input-container pb-3">
     <input
       class="form-control"
-      v-model="inputRef.val"
+      :value="inputRef.val"
       @blur="validateEmail"
+      @input="updateValue"
       :class="{ 'is-invalid': inputRef.error }"
     />
     <span v-if="inputRef.error" class="invalid-feedback">
@@ -26,11 +27,12 @@ export default defineComponent({
     rules: {
       type: Array as PropType<RuleProps>,
     },
+    modelValue: String,
   },
-  setup(props) {
+  setup(props, context) {
     const emailReg = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
     const inputRef = reactive({
-      val: "",
+      val: props.modelValue || "",
       error: false,
       errorMessage: "",
     });
@@ -54,13 +56,19 @@ export default defineComponent({
           return passed;
         });
         inputRef.error = !allPassed;
-        console.log(inputRef.errorMessage )
       }
+    };
+
+    const updateValue = (e: KeyboardEvent) => {
+      const targetValue = (e.target as HTMLInputElement).value;
+      inputRef.val = targetValue;
+      context.emit("update:modelValue", targetValue);
     };
 
     return {
       inputRef,
       validateEmail,
+      updateValue,
     };
   },
 });
