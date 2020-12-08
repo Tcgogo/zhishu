@@ -2,7 +2,7 @@
   <div class="container">
     <global-header :user="currentUser"></global-header>
     <column-list :list="list"></column-list>
-    <validate-form @form-submit="submitForm">
+    <validate-form >
       <div class="mb-3">
         <label for="exampleInputEmail1" class="form-label">账号</label>
         <validate-input
@@ -21,7 +21,6 @@
           placeholder="请输入密码"
         ></validate-input>
       </div>
-      
       <template #submit>
         <span class="btn btn-danger">Submit</span>
       </template>
@@ -36,6 +35,7 @@ import ColumnList, { ColumnProps } from "./components/ColumnList.vue";
 import GlobalHeader, { UserProps } from "./components/GlobalHeader.vue";
 import ValidateInput, { RuleProps } from "./components/ValidateInput.vue";
 import ValidateForm from "./components/ValidateForm.vue";
+import {emitter} from "./components/ValidateForm.vue";
 
 const testData: ColumnProps[] = [
   {
@@ -86,10 +86,10 @@ export default defineComponent({
     ColumnList,
     GlobalHeader,
     ValidateInput,
-    ValidateForm
+    ValidateForm,
   },
   setup() {
-    const emailVal = ref("tcgogo");
+    const emailVal = ref("aaaa@qq.com");
     const emailRules: RuleProps = [
       { type: "required", errorMessage: "电子邮箱地址不能为空！" },
       { type: "email", errorMessage: "请输入正确的电子邮箱格式！" },
@@ -99,9 +99,7 @@ export default defineComponent({
       { type: "password", errorMessage: "密码不能小于6位数" },
     ];
 
-    const submitForm = (result: boolean) => {
-      console.log(result);
-    }
+    
 
     return {
       list: testData,
@@ -109,7 +107,6 @@ export default defineComponent({
       emailRules,
       emailVal,
       passwordRules,
-      submitForm
     };
   },
 });

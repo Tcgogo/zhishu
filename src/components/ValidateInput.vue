@@ -3,7 +3,7 @@
     <input
       class="form-control"
       :value="inputRef.val"
-      @blur="validateEmail"
+      @blur="validateInput"
       @input="updateValue"
       :class="{ 'is-invalid': inputRef.error }"
       :="$attrs"
@@ -15,8 +15,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, reactive } from "vue";
-
+import { defineComponent, onMounted, onUpdated, PropType, reactive, watch } from "vue";
+import {emitter} from "./ValidateForm.vue";
+ 
 interface RuleProp {
   type: "required" | "email" | "password";
   errorMessage: string;
@@ -39,7 +40,7 @@ export default defineComponent({
       errorMessage: "",
     });
 
-    const validateEmail = () => {
+    const validateInput = (): boolean => {
       if (props.rules) {
         const allPassed = props.rules.every((rule) => {
           let passed = true;
@@ -62,7 +63,9 @@ export default defineComponent({
           return passed;
         });
         inputRef.error = !allPassed;
-      }
+        return allPassed;
+      } 
+      return true;
     };
 
     const updateValue = (e: KeyboardEvent) => {
@@ -71,10 +74,26 @@ export default defineComponent({
       context.emit("update:modelValue", targetValue);
     };
 
+    const submitForm = (result: boolean) => {
+      console.log(result)
+    };
+
+    emitter.on("form-submit",(res) => {
+      console.log(res);
+      if(!res){
+        inputRef.val = "";
+      }
+    });
+
+    onMounted(() => {
+      emitter.emit("form-item-created", validateInput);
+    })
+
     return {
       inputRef,
-      validateEmail,
+      validateInput,
       updateValue,
+      submitForm
     };
   },
 });
