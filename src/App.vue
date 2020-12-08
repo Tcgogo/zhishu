@@ -2,7 +2,7 @@
   <div class="container">
     <global-header :user="currentUser"></global-header>
     <column-list :list="list"></column-list>
-    <form>
+    <validate-form @form-submit="submitForm">
       <div class="mb-3">
         <label for="exampleInputEmail1" class="form-label">账号</label>
         <validate-input
@@ -21,7 +21,11 @@
           placeholder="请输入密码"
         ></validate-input>
       </div>
-    </form>
+      
+      <template #submit>
+        <span class="btn btn-danger">Submit</span>
+      </template>
+    </validate-form>
   </div>
 </template>
 
@@ -31,6 +35,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import ColumnList, { ColumnProps } from "./components/ColumnList.vue";
 import GlobalHeader, { UserProps } from "./components/GlobalHeader.vue";
 import ValidateInput, { RuleProps } from "./components/ValidateInput.vue";
+import ValidateForm from "./components/ValidateForm.vue";
 
 const testData: ColumnProps[] = [
   {
@@ -81,6 +86,7 @@ export default defineComponent({
     ColumnList,
     GlobalHeader,
     ValidateInput,
+    ValidateForm
   },
   setup() {
     const emailVal = ref("tcgogo");
@@ -93,12 +99,17 @@ export default defineComponent({
       { type: "password", errorMessage: "密码不能小于6位数" },
     ];
 
+    const submitForm = (result: boolean) => {
+      console.log(result);
+    }
+
     return {
       list: testData,
       currentUser,
       emailRules,
       emailVal,
-      passwordRules
+      passwordRules,
+      submitForm
     };
   },
 });
