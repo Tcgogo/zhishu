@@ -15,9 +15,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, onUpdated, PropType, reactive, watch } from "vue";
-import {emitter} from "./ValidateForm.vue";
- 
+import {
+  defineComponent,
+  onMounted,
+  onUpdated,
+  PropType,
+  reactive,
+  watch,
+} from "vue";
+import { emitter } from "./ValidateForm.vue";
+
 interface RuleProp {
   type: "required" | "email" | "password";
   errorMessage: string;
@@ -64,7 +71,7 @@ export default defineComponent({
         });
         inputRef.error = !allPassed;
         return allPassed;
-      } 
+      }
       return true;
     };
 
@@ -75,25 +82,18 @@ export default defineComponent({
     };
 
     const submitForm = (result: boolean) => {
-      console.log(result)
+      console.log(result);
     };
-
-    emitter.on("form-submit",(res) => {
-      console.log(res);
-      if(!res){
-        inputRef.val = "";
-      }
-    });
 
     onMounted(() => {
       emitter.emit("form-item-created", validateInput);
-    })
+    });
 
     return {
       inputRef,
       validateInput,
       updateValue,
-      submitForm
+      submitForm,
     };
   },
 });
