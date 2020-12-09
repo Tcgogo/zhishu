@@ -25,7 +25,6 @@ export default defineComponent({
     };
 
     const submitForm = () => {
-      console.log(111)
       const validateResult = funcArr.map((func) => {
         return func();
       }).every(result => result);

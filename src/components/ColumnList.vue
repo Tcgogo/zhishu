@@ -10,7 +10,7 @@
           />
           <h5 class="card-title">{{ column.title }}</h5>
           <p class="card-text text-left">{{ column.description }}</p>
-          <a href="#" class="btn btn-outline-primary">进入专栏</a>
+          <router-link :to="`/column/${column.id}`" class="btn btn-outline-primary">进入专栏</router-link>
         </div>
       </div>
     </div>
@@ -19,12 +19,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, PropType } from "vue";
-export interface ColumnProps {
-  id: number;
-  title: string;
-  avatar?: string;
-  description: string;
-}
+import { ColumnProps , testData} from "../testDate";
 
 export default defineComponent({
   name: "ColumnList",

@@ -28,8 +28,10 @@
 
 <script lang="ts">
 import { defineComponent,ref } from "vue";
+import { useRouter } from "vue-router";
 import ValidateInput, { RuleProps } from "../components/ValidateInput.vue";
 import ValidateForm from "../components/ValidateForm.vue";
+import { emitter } from "../components/ValidateForm.vue";
 
 
 export default defineComponent({
@@ -47,6 +49,18 @@ export default defineComponent({
       { type: "required", errorMessage: "密码不能为空！" },
       { type: "password", errorMessage: "密码不能小于6位数" },
     ];
+
+    const router = useRouter();
+    emitter.on("form-submit", (res) => {
+      if(res) {
+        router.push({
+          name: 'column',
+          params: {
+            id: 1
+          }
+        })
+      }
+    });
     return {
       emailRules,
       emailVal,

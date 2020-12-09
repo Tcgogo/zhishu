@@ -81,9 +81,6 @@ export default defineComponent({
       context.emit("update:modelValue", targetValue);
     };
 
-    const submitForm = (result: boolean) => {
-      console.log(result);
-    };
 
     onMounted(() => {
       emitter.emit("form-item-created", validateInput);
@@ -93,7 +90,6 @@ export default defineComponent({
       inputRef,
       validateInput,
       updateValue,
-      submitForm,
     };
   },
 });
