@@ -29,6 +29,7 @@
 <script lang="ts">
 import { defineComponent,ref } from "vue";
 import { useRouter } from "vue-router";
+import { useStore } from "vuex";
 import ValidateInput, { RuleProps } from "../components/ValidateInput.vue";
 import ValidateForm from "../components/ValidateForm.vue";
 import { emitter } from "../components/ValidateForm.vue";
@@ -51,14 +52,17 @@ export default defineComponent({
     ];
 
     const router = useRouter();
+    const store = useStore();
     emitter.on("form-submit", (res) => {
       if(res) {
+        store.commit("login")
+
         router.push({
           name: 'column',
           params: {
             id: 1
           }
-        })
+        });
       }
     });
     return {
