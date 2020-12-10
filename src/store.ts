@@ -1,4 +1,4 @@
-import { createStore } from "vuex";
+import { createStore, Commit } from "vuex";
 import axios from "axios";
 
 export interface UserProps {
@@ -24,7 +24,6 @@ export interface PostProps {
   column: string;
 }
 
-
 export interface ColumnProps {
   _id: string;
   title: string;
@@ -33,20 +32,31 @@ export interface ColumnProps {
 }
 
 export interface GlobalDataProps {
+  loading: boolean;
   columns: ColumnProps[];
   posts: PostProps[];
   user: UserProps;
 }
 
+const getAndCommit = async (
+  url: string,
+  mutationName: string,
+  commit: Commit
+) => {
+  const { data } = await axios.get(url);
+  commit(mutationName, data);
+};
+
 const store = createStore<GlobalDataProps>({
   state: {
+    loading: false,
     columns: [],
     posts: [],
-    user: { isLogin: false, columnId: "1", name: "tcgogos"},
+    user: { isLogin: false, columnId: "1", name: "tcgogos" },
   },
   mutations: {
     login(state) {
-      state.user = {  isLogin: true, name: "tcgogos" };
+      state.user = { isLogin: true, name: "tcgogos" };
     },
     createPost(state, newPost) {
       state.posts.push(newPost);
@@ -59,31 +69,30 @@ const store = createStore<GlobalDataProps>({
     },
     fetchPosts(state, rawData) {
       state.posts = rawData.data.list;
+    },
+    setLoading(state, status) {
+      state.loading = status;
     }
-
   },
   getters: {
     getColumnById: (state) => (id: string) => {
-      return state.columns.find(c => c._id === id);
+      return state.columns.find((c) => c._id === id);
     },
     getPostsById: (state) => (cid: string) => {
-      return state.posts.filter(post => post.column === cid);
+      return state.posts.filter((post) => post.column === cid);
     },
   },
   actions: {
-    async fetchColumns({commit}) {
-      const resp = await axios.get('./columns');
-      commit("fetchColumns", resp.data);
+    fetchColumns({ commit }) {
+      getAndCommit("./columns", "fetchColumns", commit);
     },
-    async fetchColumn({commit}, cid) {
-      const resp = await axios.get(`/columns/${cid}`);
-      commit("fetchColumn", resp.data);
+    fetchColumn({ commit }, cid) {
+      getAndCommit(`/columns/${cid}`, "fetchColumn", commit);
     },
-    async fetchPosts({commit}, cid) {
-      const resp = await axios.get(`/columns/${cid}/posts`);
-      commit("fetchPosts", resp.data);
-    }
-  }
+    fetchPosts({ commit }, cid) {
+      getAndCommit(`/columns/${cid}/posts`, "fetchPosts", commit);
+    },
+  },
 });
 
 export default store;
