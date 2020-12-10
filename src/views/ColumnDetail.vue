@@ -2,21 +2,21 @@
   <div class="column-detail-page w-75 mx-auto">
     <div class="column-info row mb-4 border-bottom pd-4 align-items-center">
       <div class="col-3 text-center">
-        <img :src="column.avatar" :alt="column.title" class="rounded-lg w-100">
+        <img :src="column.avatar && column.avatar.url" :alt="column.title" class="rounded-lg w-100">
       </div>
       <div class="col-9">
         <h4>{{ column.title }}</h4>
         <p class="text-muted">{{ column.description }}</p>
       </div>
     </div>
-    <post-list :list="list"></post-list>
+    <post-list v-if="list" :list="list"></post-list>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, onMounted } from 'vue'
 import { useRoute } from "vue-router";
-import { testData, testPosts } from "../testDate";
+import { useStore } from "vuex";
 import PostList from "../components/PostList.vue";
 
 export default defineComponent({
@@ -26,9 +26,14 @@ export default defineComponent({
   },
   setup() {
     const route = useRoute();
-    const currentId = +route.params.id;
-    const column = testData.find( c => c.id === currentId);
-    const list = testPosts.filter(post => post.columnId === currentId);
+    const store = useStore();
+    const currentId = route.params.id;
+    onMounted(() => {
+      store.dispatch("fetchColumn", currentId);
+      store.dispatch("fetchPosts", currentId);
+    })
+    const column = store.getters.getColumnById(currentId);
+    const list = store.getters.getPostsById(currentId);
     return {
       column,
       list

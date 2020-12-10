@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <validate-form>
+    <validate-form @formSubmit="formSubmit">
       <div class="mb-3">
         <label for="exampleInputEmail1" class="form-label">账号</label>
         <validate-input
@@ -32,7 +32,6 @@ import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 import ValidateInput, { RuleProps } from "../components/ValidateInput.vue";
 import ValidateForm from "../components/ValidateForm.vue";
-import { emitter } from "../components/ValidateForm.vue";
 
 
 export default defineComponent({
@@ -41,7 +40,7 @@ export default defineComponent({
     ValidateForm,
   },
   setup() {
-    const emailVal = ref("aaaas");
+    const emailVal = ref("aaaas@qq.com");
     const emailRules: RuleProps = [
       { type: "required", errorMessage: "电子邮箱地址不能为空！" },
       { type: "email", errorMessage: "请输入正确的电子邮箱格式！" },
@@ -53,10 +52,9 @@ export default defineComponent({
 
     const router = useRouter();
     const store = useStore();
-    emitter.on("form-submit", (res) => {
+    const formSubmit = (res: boolean) => {
       if(res) {
         store.commit("login")
-
         router.push({
           name: 'column',
           params: {
@@ -64,11 +62,12 @@ export default defineComponent({
           }
         });
       }
-    });
+    }
     return {
       emailRules,
       emailVal,
       passwordRules,
+      formSubmit
     };
   },
 });

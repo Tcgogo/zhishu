@@ -28,8 +28,8 @@ export default defineComponent({
       const validateResult = funcArr.map((func) => {
         return func();
       }).every(result => result);
-
-      emitter.emit("form-submit", validateResult);
+      // emitter.emit("form-submit", validateResult);
+      context.emit("form-submit",validateResult);
     };
 
     emitter.on("form-item-created", callback);

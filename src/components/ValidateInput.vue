@@ -1,6 +1,16 @@
 <template>
   <div class="validata-input-container pb-3">
     <input
+      v-if="tag !== 'textarea'"
+      class="form-control"
+      :value="inputRef.val"
+      @blur="validateInput"
+      @input="updateValue"
+      :class="{ 'is-invalid': inputRef.error }"
+      :="$attrs"
+    />
+    <textarea
+      v-else
       class="form-control"
       :value="inputRef.val"
       @blur="validateInput"
@@ -30,6 +40,7 @@ interface RuleProp {
   errorMessage: string;
 }
 export type RuleProps = RuleProp[];
+export type TagType = "input" | "textarea";
 
 export default defineComponent({
   props: {
@@ -37,6 +48,10 @@ export default defineComponent({
       type: Array as PropType<RuleProps>,
     },
     modelValue: String,
+    tag: {
+      type: String as PropType<TagType>,
+      default: "input",
+    },
   },
   inheritAttrs: false,
   setup(props, context) {
@@ -80,7 +95,6 @@ export default defineComponent({
       inputRef.val = targetValue;
       context.emit("update:modelValue", targetValue);
     };
-
 
     onMounted(() => {
       emitter.emit("form-item-created", validateInput);
