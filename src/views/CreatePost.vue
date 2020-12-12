@@ -56,13 +56,13 @@ export default defineComponent({
     const router = useRouter();
     const formSubmit = (res: boolean) => {
       if (res) {
-        const { columnId } = store.state.user; 
-        if (columnId) {
+        const { column } = store.state.user; 
+        if (column) {
           const newPost: PostProps = {
             _id: new Date().getTime() + "",
             title: titleVal.value,
             content: contentVal.value,
-            column: columnId,
+            column: column,
             createdAt: new Date().toLocaleString(),
           };
 
@@ -70,7 +70,7 @@ export default defineComponent({
           router.push({
             name: "column",
             params: {
-              id: columnId,
+              id: column,
             },
           });
         }

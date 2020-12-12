@@ -14,7 +14,7 @@
         <label for="exampleInputPassword1" class="form-label">密码</label>
         <validate-input
           :rules="passwordRules"
-          v-model="emailVal"
+          v-model="passwordVal"
           type="password"
           placeholder="请输入密码"
         ></validate-input>
@@ -40,7 +40,8 @@ export default defineComponent({
     ValidateForm,
   },
   setup() {
-    const emailVal = ref("aaaas@qq.com");
+    const emailVal = ref("111@test.com");
+    const passwordVal = ref("111111");
     const emailRules: RuleProps = [
       { type: "required", errorMessage: "电子邮箱地址不能为空！" },
       { type: "email", errorMessage: "请输入正确的电子邮箱格式！" },
@@ -54,20 +55,24 @@ export default defineComponent({
     const store = useStore();
     const formSubmit = (res: boolean) => {
       if(res) {
-        store.commit("login")
-        router.push({
-          name: 'column',
-          params: {
-            id: 1
-          }
-        });
+        const payload = {
+          email: emailVal.value,
+          password: passwordVal.value
+        }
+        store.dispatch("loginAndFetch", payload).then(data => {
+          console.log(data);
+          router.push('/');
+        }).catch( e => {
+          console.log(e);
+        })
       }
     }
     return {
       emailRules,
       emailVal,
       passwordRules,
-      formSubmit
+      formSubmit,
+      passwordVal
     };
   },
 });

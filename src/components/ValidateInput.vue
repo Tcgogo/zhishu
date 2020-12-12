@@ -28,10 +28,8 @@
 import {
   defineComponent,
   onMounted,
-  onUpdated,
   PropType,
   reactive,
-  watch,
 } from "vue";
 import { emitter } from "./ValidateForm.vue";
 
@@ -76,7 +74,7 @@ export default defineComponent({
               passed = emailReg.test(inputRef.val);
               break;
             case "password":
-              passed = inputRef.val.length > 6;
+              passed = inputRef.val.length > 5;
               inputRef.errorMessage = rule.errorMessage;
               break;
             default:
