@@ -27,12 +27,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent,ref } from "vue";
+import { defineComponent, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 import ValidateInput, { RuleProps } from "../components/ValidateInput.vue";
 import ValidateForm from "../components/ValidateForm.vue";
-
+import createMessage from "../hooks/useCreateMessage";
 
 export default defineComponent({
   components: {
@@ -54,25 +54,30 @@ export default defineComponent({
     const router = useRouter();
     const store = useStore();
     const formSubmit = (res: boolean) => {
-      if(res) {
+      if (res) {
         const payload = {
           email: emailVal.value,
-          password: passwordVal.value
-        }
-        store.dispatch("loginAndFetch", payload).then(data => {
-          console.log(data);
-          router.push('/');
-        }).catch( e => {
-          console.log(e);
-        })
+          password: passwordVal.value,
+        };
+        store
+          .dispatch("loginAndFetch", payload)
+          .then(() => {
+            createMessage("登录成功，2秒后跳转到首页...", "success");
+            setTimeout(() => {
+              router.push("/");
+            }, 2000);
+          })
+          .catch((e) => {
+            console.log(e);
+          });
       }
-    }
+    };
     return {
       emailRules,
       emailVal,
       passwordRules,
       formSubmit,
-      passwordVal
+      passwordVal,
     };
   },
 });

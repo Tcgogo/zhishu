@@ -1,7 +1,6 @@
 <template>
   <div class="container">
     <global-header :user="currentUser"></global-header>
-    <message v-if="error.status" :type="'error'" :message="error.message"></message>
     <loader
       v-if="isLoading"
       text="拼命加载中"
@@ -24,21 +23,20 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, onMounted } from "vue";
+import { defineComponent, computed, onMounted, watch } from "vue";
 import axios from "axios";
 import { useStore } from "vuex";
 import { GlobalDataProps } from "./store";
 import "bootstrap/dist/css/bootstrap.min.css";
 import GlobalHeader from "./components/GlobalHeader.vue";
 import Loader from "./components/Loader.vue";
-import Message from "./components/Message.vue"
+import createMessage  from "./hooks/useCreateMessage";
 
 export default defineComponent({
   name: "App",
   components: {
     GlobalHeader,
     Loader,
-    Message
   },
   setup() {
     const store = useStore<GlobalDataProps>();
@@ -53,6 +51,12 @@ export default defineComponent({
         store.dispatch("fetchCurrentUser");
       }
     });
+
+    watch(() => error.value.status, () => {
+      if(error.value.status && error.value.message){
+        createMessage(error.value.message, "error");
+      }
+    })
     return {
       currentUser,
       isLoading,
