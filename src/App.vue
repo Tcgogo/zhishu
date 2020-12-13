@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <global-header :user="currentUser"></global-header>
-    <h1 v-if="error.status">{{ error.message }}</h1>
+    <message v-if="error.status" :type="'error'" :message="error.message"></message>
     <loader
       v-if="isLoading"
       text="拼命加载中"
@@ -31,12 +31,14 @@ import { GlobalDataProps } from "./store";
 import "bootstrap/dist/css/bootstrap.min.css";
 import GlobalHeader from "./components/GlobalHeader.vue";
 import Loader from "./components/Loader.vue";
+import Message from "./components/Message.vue"
 
 export default defineComponent({
   name: "App",
   components: {
     GlobalHeader,
     Loader,
+    Message
   },
   setup() {
     const store = useStore<GlobalDataProps>();
