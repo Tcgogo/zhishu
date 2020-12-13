@@ -1,10 +1,12 @@
 <template>
   <form class="validate-form-container">
     <slot name="default"></slot>
-    <div class="submit-area" @click.prevent="submitForm">
-      <slot name="submit">
-        <button type="submit" class="btn btn-primary">提交</button>
+    <div class="submit-area">
+      <div @click.prevent="submitForm" class="validate-btn">
+        <slot name="submit" >
+        <button type="submit"  class="btn btn-primary">提交</button>
       </slot>
+      </div>
     </div>
   </form>
 </template>
@@ -29,6 +31,7 @@ export default defineComponent({
         return func();
       }).every(result => result);
       // emitter.emit("form-submit", validateResult);
+      console.log(111);
       context.emit("form-submit",validateResult);
     };
 
@@ -45,5 +48,8 @@ export default defineComponent({
 });
 </script>
 
-<style>
+<style scoped>
+.validate-btn {
+  display: inline-block;
+}
 </style>

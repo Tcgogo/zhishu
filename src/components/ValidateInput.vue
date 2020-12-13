@@ -34,8 +34,9 @@ import {
 import { emitter } from "./ValidateForm.vue";
 
 interface RuleProp {
-  type: "required" | "email" | "password";
+  type: "required" | "email" | "password" | "name" | "custom";
   errorMessage: string;
+  validator?: () => boolean;
 }
 export type RuleProps = RuleProp[];
 export type TagType = "input" | "textarea";
@@ -75,6 +76,14 @@ export default defineComponent({
               break;
             case "password":
               passed = inputRef.val.length > 5;
+              inputRef.errorMessage = rule.errorMessage;
+              break;
+            case "name":
+              passed = inputRef.val.length > 2;
+              inputRef.errorMessage = rule.errorMessage;
+              break;
+            case "custom": 
+              passed = rule.validator && rule.validator() || false;
               inputRef.errorMessage = rule.errorMessage;
               break;
             default:
