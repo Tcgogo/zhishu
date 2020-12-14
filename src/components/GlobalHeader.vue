@@ -25,7 +25,7 @@
             ><a href="#" class="dropdown-item">编辑资料</a></dropdown-item
           >
           <dropdown-item
-            ><a href="#" class="dropdown-item">退出登录</a></dropdown-item
+            ><a href="#" @click="logout" class="dropdown-item">退出登录</a></dropdown-item
           >
         </dropdown>
       </li>
@@ -35,6 +35,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { useStore } from "vuex";
 import Dropdown from "./Dropdown.vue";
 import DropdownItem from "./DropdownItem.vue";
 import { UserProps } from "../store";
@@ -50,6 +51,16 @@ export default defineComponent({
     Dropdown,
     DropdownItem,
   },
+  setup () {
+    const store = useStore();
+    const logout = () => {
+      store.commit("logout");
+    }
+
+    return {
+      logout
+    }
+  }
 });
 </script>
 

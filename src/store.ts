@@ -16,13 +16,15 @@ interface ImageProps {
 }
 
 export interface PostProps {
-  _id: string;
+  _id?: string;
   title: string;
   excerpt?: string;
   content?: string;
-  image?: ImageProps;
-  createdAt: string;
+  image?: ImageProps | string;
+  createdAt?: string;
   column: string;
+  author?: string | UserProps;
+  isHTML?: boolean;
 }
 
 export interface ColumnProps {
@@ -102,6 +104,12 @@ const store = createStore<GlobalDataProps>({
       state.token = token;
       localStorage.setItem("token", token);
       axios.defaults.headers.common.Authorization = `Bearer ${token}`;
+    },
+    logout(state) {
+      state.token = ''
+      state.user = { isLogin: false }
+      localStorage.removeItem('token')
+      delete axios.defaults.headers.common.Authorization
     },
   },
   getters: {

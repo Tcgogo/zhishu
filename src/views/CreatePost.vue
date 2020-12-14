@@ -1,6 +1,17 @@
 <template>
   <div class="create-post-page">
     <h4>新建文章</h4>
+    <uploader :action="'/upload'" :beforUpload="beforUpload">
+    <h2>点击上传</h2>
+    <template #loading>
+      <div class="spinner-border" role="status">
+        <span class="sr-only"></span>Loading...
+      </div>
+    </template>
+     <template #success="slotProps">
+      <img :src="slotProps.respData.data.url" alt="" width="500">
+    </template>
+    </uploader>
     <validate-form @formSubmit="formSubmit">
       <div class="mb-3">
         <label class="form-label">文章标题：</label>
@@ -32,14 +43,19 @@
 import { defineComponent, ref } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
+import { GlobalDataProps, PostProps } from "../store";
+
 import ValidateForm from "../components/ValidateForm.vue";
 import ValidateInput, { RuleProps } from "../components/ValidateInput.vue";
-import { GlobalDataProps, PostProps } from "../store";
+import Uploader from "../components/Uploader.vue";
+import createMessage from "../hooks/useCreateMessage";
+
 export default defineComponent({
   name: "CreatePost",
   components: {
     ValidateForm,
     ValidateInput,
+    Uploader
   },
   setup() {
     const titleRules: RuleProps = [
@@ -56,14 +72,12 @@ export default defineComponent({
     const router = useRouter();
     const formSubmit = (res: boolean) => {
       if (res) {
-        const { column } = store.state.user; 
+        const { column } = store.state.user;
         if (column) {
           const newPost: PostProps = {
-            _id: new Date().getTime() + "",
             title: titleVal.value,
             content: contentVal.value,
             column: column,
-            createdAt: new Date().toLocaleString(),
           };
 
           store.commit("createPost", newPost);
@@ -77,12 +91,21 @@ export default defineComponent({
       }
     };
 
+    const beforUpload = (file: File) => {
+      const isJPGOrPGN = file.type === "image/jpeg" || file.type === "image/png";
+      if(!isJPGOrPGN) {
+        createMessage("文件格式只支持JPG或PNG！","error");
+      }
+      return isJPGOrPGN;
+    }
+
     return {
       titleRules,
       contentRules,
       titleVal,
       contentVal,
-      formSubmit
+      formSubmit,
+      beforUpload
     };
   },
 });
