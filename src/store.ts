@@ -9,7 +9,13 @@ export interface UserProps {
   email?: string;
 }
 
-interface ImageProps {
+export interface ResponseType<P = {}> {
+  code: number;
+  msg: string;
+  data: P;
+}
+
+export interface ImageProps {
   _id?: string;
   url?: string;
   createAt?: string;
@@ -55,6 +61,7 @@ const getAndCommit = async (
 ) => {
   const { data } = await axios.get(url);
   commit(mutationName, data);
+  return data;
 };
 
 const postAndCommit = async (
@@ -106,10 +113,10 @@ const store = createStore<GlobalDataProps>({
       axios.defaults.headers.common.Authorization = `Bearer ${token}`;
     },
     logout(state) {
-      state.token = ''
-      state.user = { isLogin: false }
-      localStorage.removeItem('token')
-      delete axios.defaults.headers.common.Authorization
+      state.token = "";
+      state.user = { isLogin: false };
+      localStorage.removeItem("token");
+      delete axios.defaults.headers.common.Authorization;
     },
   },
   getters: {
@@ -122,16 +129,16 @@ const store = createStore<GlobalDataProps>({
   },
   actions: {
     fetchColumns({ commit }) {
-      getAndCommit("./columns", "fetchColumns", commit);
+      return getAndCommit("./columns", "fetchColumns", commit);
     },
     fetchColumn({ commit }, cid) {
-      getAndCommit(`/columns/${cid}`, "fetchColumn", commit);
+      return getAndCommit(`/columns/${cid}`, "fetchColumn", commit);
     },
     fetchPosts({ commit }, cid) {
-      getAndCommit(`/columns/${cid}/posts`, "fetchPosts", commit);
+      return getAndCommit(`/columns/${cid}/posts`, "fetchPosts", commit);
     },
     fetchCurrentUser({ commit }) {
-      getAndCommit("/user/current", "fetchCurrentUser", commit);
+      return getAndCommit("/user/current", "fetchCurrentUser", commit);
     },
     login({ commit }, payload) {
       return postAndCommit("/user/login", "login", commit, payload);

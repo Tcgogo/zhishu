@@ -35,7 +35,8 @@ export default defineComponent({
       type: Function as PropType<CheckFunction>,
     },
   },
-  setup(props) {
+  emits: ['file-upload', 'file-uploaded-error'],
+  setup(props, context) {
     const fileInput = ref<null | HTMLInputElement>(null);
     const fileStatus = ref<UploadStatus>("ready");
     const respData = ref(null);
@@ -69,9 +70,11 @@ export default defineComponent({
           .then((resp: any) => {
             fileStatus.value = "success";
             respData.value = resp.data;
+            context.emit('file-upload',resp.data);
           })
-          .catch(() => {
+          .catch((error) => {
             fileStatus.value = "error";
+            context.emit('file-uploaded-error',error);
           })
           .finally(() => {
             if (fileInput.value) {
