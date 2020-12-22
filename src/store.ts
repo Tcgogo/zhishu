@@ -4,7 +4,7 @@ import axios from "axios";
 export interface UserProps {
   isLogin: boolean;
   nickName?: string;
-  _id?: number;
+  _id?: string;
   column?: string;
   email?: string;
 }
@@ -19,6 +19,7 @@ export interface ImageProps {
   _id?: string;
   url?: string;
   createAt?: string;
+  fitUrl?: string;
 }
 
 export interface PostProps {
@@ -29,7 +30,7 @@ export interface PostProps {
   image?: ImageProps | string;
   createdAt?: string;
   column: string;
-  author?: string | UserProps;
+  author?: string;
   isHTML?: boolean;
 }
 
@@ -148,6 +149,9 @@ const store = createStore<GlobalDataProps>({
         return dispatch("fetchCurrentUser");
       });
     },
+    createPost({ commit }, newPost) {
+      return postAndCommit("/posts", "createPost", commit, newPost);
+    }
   },
 });
 

@@ -4,7 +4,7 @@
     <uploader
       :action="'/upload'"
       :beforUpload="beforUpload"
-      @fileUpload="onFileUpload"
+      @fileUpload="handleFileUploaded"
       @fileUploadedError="onFileUploadedError"
       class="d-flex align-items-center justify-content-center bg-light text-secondary w-100 my-4 file-upload-container"
     >
@@ -80,27 +80,41 @@ export default defineComponent({
 
     const store = useStore<GlobalDataProps>();
     const router = useRouter();
+
+    let imageId = "";
+    const handleFileUploaded = (rawDate: ResponseType<ImageProps>) => {
+      if (rawDate.data._id) {
+        imageId = rawDate.data._id;
+        console.log(imageId)
+      }
+    };
+
     const formSubmit = (res: boolean) => {
       if (res) {
-        const { column } = store.state.user;
+        const { column, _id } = store.state.user;
         if (column) {
           const newPost: PostProps = {
             title: titleVal.value,
             content: contentVal.value,
             column: column,
+            author: _id,
           };
 
-          store.commit("createPost", newPost);
-          router.push({
-            name: "column",
-            params: {
-              id: column,
-            },
+          if(imageId) {
+            newPost.image = imageId;
+          }
+
+          store.dispatch("createPost", newPost).then(() => {
+            createMessage("发表成功，2秒后跳转到文章", "success", 2000);
+            setTimeout(()=> {
+              router.push({name: "column", params: { id: column }})
+            }, 2000);
           });
         }
       }
     };
 
+    //验证图片格式与大小
     const beforUpload = (file: File) => {
       const result = beforeUploadCheck(file, {
         format: ["image/jpeg", "image/png"],
@@ -108,19 +122,16 @@ export default defineComponent({
       });
       const { passed, error } = result;
       if (error === "format") {
-        createMessage("上传图片只能是 JPG/PNG 格式!", "error");
+        createMessage("上传图片只能是 JPG/PNG 格式!", "error", 2000);
       }
       if (error === "size") {
-        createMessage("上传图片大小不能超过 1Mb", "error");
+        createMessage("上传图片大小不能超过 1Mb", "error", 2000);
       }
       return passed;
     };
-    
-    const onFileUpload = (rawData: ResponseType<ImageProps>) => {
-      createMessage(`上传图片ID: ${rawData.data._id}`, "success");
-    };
+
     const onFileUploadedError = (error: any) => {
-      createMessage(`${error.message}`, "error");
+      createMessage(`${error.message}`, "error", 2000);
     };
 
     return {
@@ -130,8 +141,8 @@ export default defineComponent({
       contentVal,
       formSubmit,
       beforUpload,
-      onFileUpload,
       onFileUploadedError,
+      handleFileUploaded,
     };
   },
 });

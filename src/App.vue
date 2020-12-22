@@ -45,7 +45,7 @@ export default defineComponent({
 
     watch(() => error.value.status, () => {
       if(error.value.status && error.value.message){
-        createMessage(error.value.message, "error");
+        createMessage(error.value.message, "error", 2000);
       }
     })
     return {

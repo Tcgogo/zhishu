@@ -98,7 +98,7 @@ export default defineComponent({
         axios
           .post("/users", payload)
           .then(() => {
-            createMessage("注册成功 正在转跳到登录页面", "success");
+            createMessage("注册成功 正在转跳到登录页面", "success", 2000);
             setTimeout(() => {
               router.push("/login");
             }, 2000);

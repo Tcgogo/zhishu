@@ -2,7 +2,11 @@
   <div class="column-detail-page w-75 mx-auto">
     <div class="column-info row mb-4 border-bottom pd-4 align-items-center">
       <div class="col-3 text-center">
-        <img :src="column.avatar && column.avatar.url" :alt="column.title" class="rounded-lg w-100">
+        <img
+          :src="column.avatar && column.avatar.url"
+          :alt="column.title"
+          class="rounded-lg w-100"
+        />
       </div>
       <div class="col-9">
         <h4>{{ column.title }}</h4>
@@ -14,15 +18,16 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted } from 'vue'
+import { computed, defineComponent, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 import PostList from "../components/PostList.vue";
+import { generateFitUrl } from "../helper";
 
 export default defineComponent({
   name: "ColumnDetail",
   components: {
-    PostList
+    PostList,
   },
   setup() {
     const route = useRoute();
@@ -31,17 +36,22 @@ export default defineComponent({
     onMounted(() => {
       store.dispatch("fetchColumn", currentId);
       store.dispatch("fetchPosts", currentId);
-    })
-    const column = computed(() => store.getters.getColumnById(currentId));
+    });
+    const column = computed(() => {
+      const selectColumn = store.getters.getColumnById(currentId);
+      if(selectColumn) {
+        generateFitUrl(selectColumn, 100, 100);
+      }
+      return selectColumn;
+    });
     const list = computed(() => store.getters.getPostsById(currentId));
     return {
       column,
-      list
-    }
-  }
-})
+      list,
+    };
+  },
+});
 </script>
 
 <style>
-
 </style>

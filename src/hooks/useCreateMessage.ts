@@ -3,7 +3,7 @@ import Message from "../components/Message.vue";
 export type MessageType = "success" | "error" | "default";
 
 
-function createMessage(message: string, type: MessageType) {
+function createMessage(message: string, type: MessageType, delay: number) {
   const messageInstance = createApp(Message, {
     message,
     type
@@ -15,7 +15,7 @@ function createMessage(message: string, type: MessageType) {
   setTimeout(() => {
     messageInstance.unmount(mountNode);
     document.body.removeChild(mountNode);
-  }, 2000)
+  }, delay)
 }
 
 export default createMessage;
