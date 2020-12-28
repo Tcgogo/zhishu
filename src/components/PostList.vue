@@ -2,7 +2,7 @@
   <div class="post-list">
     <article v-for="post in list" :key="post._id" class="card mb-3 shadow-sm">
       <div class="card-body">
-        <h4>{{ post.title }}</h4>
+        <router-link :to="'/posts/'+ post._id"><h4>{{ post.title }}</h4></router-link>
         <div class="row my-3 align-items-center">
           <div v-if="post.image" class="col-3">
             <img :src="typeof post.image === 'object' && post.image.url" :alt="post.title" class="rounded-lg w-100" />

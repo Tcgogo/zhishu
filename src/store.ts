@@ -1,5 +1,6 @@
 import { createStore, Commit } from "vuex";
 import axios from "axios";
+import { objToArr, arrToObj } from "./helper";
 
 export interface UserProps {
   isLogin: boolean;
@@ -7,6 +8,8 @@ export interface UserProps {
   _id?: string;
   column?: string;
   email?: string;
+  avatar?: ImageProps;
+  description?: string;
 }
 
 export interface ResponseType<P = {}> {
@@ -30,7 +33,7 @@ export interface PostProps {
   image?: ImageProps | string;
   createdAt?: string;
   column: string;
-  author?: string;
+  author?: string | UserProps;
   isHTML?: boolean;
 }
 
@@ -46,11 +49,15 @@ export interface GlobalErrorProps {
   message?: string;
 }
 
+interface ListProps<P> {
+  [id: string]: P;
+}
+
 export interface GlobalDataProps {
   error: GlobalErrorProps;
   loading: boolean;
   columns: ColumnProps[];
-  posts: PostProps[];
+  posts: { data: ListProps<PostProps>; loadedColumns: string[] };
   user: UserProps;
   token: string;
 }
@@ -81,13 +88,14 @@ const store = createStore<GlobalDataProps>({
     error: { status: false },
     loading: false,
     columns: [],
-    posts: [],
+    posts: { data: {}, loadedColumns: [] },
     user: { isLogin: false },
     token: localStorage.getItem("token") || "",
   },
   mutations: {
+    //发表文章
     createPost(state, newPost) {
-      state.posts.push(newPost);
+      state.posts.data[newPost._id] = newPost;
     },
     fetchColumns(state, rawData) {
       state.columns = rawData.data.list;
@@ -95,8 +103,12 @@ const store = createStore<GlobalDataProps>({
     fetchColumn(state, rawData) {
       state.columns = [rawData.data];
     },
-    fetchPosts(state, rawData) {
-      state.posts = rawData.data.list;
+    fetchPosts(state, {data: rawData, extraData: columnId}) {
+      state.posts.data = { ...state.posts.data, ...arrToObj(rawData.list) }
+      state.posts.loadedColumns.push(columnId)
+    },
+    fetchPost(state, rawData) {
+      state.posts.data[rawData.data._id] = rawData.data
     },
     fetchCurrentUser(state, rawData) {
       state.user = { isLogin: true, ...rawData.data };
@@ -125,8 +137,11 @@ const store = createStore<GlobalDataProps>({
       return state.columns.find((c) => c._id === id);
     },
     getPostsById: (state) => (cid: string) => {
-      return state.posts.filter((post) => post.column === cid);
+      return objToArr(state.posts.data).filter(post => post.column === cid)
     },
+    getCurrentPost: (state) => (id: string) => {
+      return state.posts.data[id]
+    }
   },
   actions: {
     fetchColumns({ commit }) {
@@ -137,6 +152,14 @@ const store = createStore<GlobalDataProps>({
     },
     fetchPosts({ commit }, cid) {
       return getAndCommit(`/columns/${cid}/posts`, "fetchPosts", commit);
+    },
+    fetchPost({ state, commit }, id) {
+      const currentPost = state.posts.data[id]
+      if (!currentPost || !currentPost.content) {
+        return getAndCommit(`/posts/${id}`, 'fetchPost', commit)
+      } else {
+        return Promise.resolve({ data: currentPost })
+      }
     },
     fetchCurrentUser({ commit }) {
       return getAndCommit("/user/current", "fetchCurrentUser", commit);

@@ -4,6 +4,7 @@
     <uploader
       :action="'/upload'"
       :beforUpload="beforUpload"
+      :uploaded="uploadedData"
       @fileUpload="handleFileUploaded"
       @fileUploadedError="onFileUploadedError"
       class="d-flex align-items-center justify-content-center bg-light text-secondary w-100 my-4 file-upload-container"
@@ -49,9 +50,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 import { useStore } from "vuex";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import { GlobalDataProps, PostProps, ResponseType, ImageProps } from "../store";
 import { beforeUploadCheck } from "../helper";
 
@@ -77,15 +78,30 @@ export default defineComponent({
 
     const titleVal = ref("");
     const contentVal = ref("");
-
     const store = useStore<GlobalDataProps>();
     const router = useRouter();
+    const route = useRoute();
+    const isEditMode = !!route.query.id;
+    const uploadedData = ref();
+
+    onMounted(() => {
+      if (isEditMode) {
+        store
+          .dispatch("fetchPost", route.query.id)
+          .then((rawDate: ResponseType<PostProps>) => {
+            const currentPost = rawDate.data;
+            
+            if (currentPost.image) {
+              uploadedData.value = { data: currentPost.image };
+            }
+          });
+      }
+    });
 
     let imageId = "";
     const handleFileUploaded = (rawDate: ResponseType<ImageProps>) => {
       if (rawDate.data._id) {
         imageId = rawDate.data._id;
-        console.log(imageId)
       }
     };
 
@@ -100,14 +116,14 @@ export default defineComponent({
             author: _id,
           };
 
-          if(imageId) {
+          if (imageId) {
             newPost.image = imageId;
           }
 
           store.dispatch("createPost", newPost).then(() => {
             createMessage("发表成功，2秒后跳转到文章", "success", 2000);
-            setTimeout(()=> {
-              router.push({name: "column", params: { id: column }})
+            setTimeout(() => {
+              router.push({ name: "column", params: { id: column } });
             }, 2000);
           });
         }
@@ -143,6 +159,7 @@ export default defineComponent({
       beforUpload,
       onFileUploadedError,
       handleFileUploaded,
+      uploadedData,
     };
   },
 });
