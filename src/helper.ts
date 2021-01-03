@@ -9,6 +9,7 @@ export function generateFitUrl(data: ImageProps, width: number, height: number, 
   }
 }
 
+
 export function addColumnAvatar(data: ColumnProps | UserProps, width: number, height: number) {
   if (data.avatar) {
     generateFitUrl(data.avatar, width, height)

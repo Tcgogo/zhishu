@@ -1,9 +1,12 @@
 <template>
   <div class="column-detail-page w-75 mx-auto">
-    <div class="column-info row mb-4 border-bottom pd-4 align-items-center">
+    <div
+      class="column-info row mb-4 border-bottom pd-4 align-items-center"
+      v-if="column"
+    >
       <div class="col-3 text-center">
         <img
-          :src="column.avatar && column.avatar.url"
+          :src="column.avatar && column.avatar.fitUrl"
           :alt="column.title"
           class="rounded-lg w-100"
         />
@@ -14,6 +17,15 @@
       </div>
     </div>
     <post-list v-if="list" :list="list"></post-list>
+    <div class="more-btn">
+      <button
+        class="btn btn-outline-primary mt-2 mb-5 mx-auto btn-block w-25"
+        @click="loadMorePage"
+        v-if="!isLastPage"
+      >
+        加载更多
+      </button>
+    </div>
   </div>
 </template>
 
@@ -22,7 +34,9 @@ import { computed, defineComponent, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 import PostList from "../components/PostList.vue";
-import { generateFitUrl } from "../helper";
+import { addColumnAvatar } from "../helper";
+import { GlobalDataProps, ColumnProps } from "../store";
+import useLoadMore from "../hooks/useLoadMore";
 
 export default defineComponent({
   name: "ColumnDetail",
@@ -31,23 +45,43 @@ export default defineComponent({
   },
   setup() {
     const route = useRoute();
-    const store = useStore();
+    const store = useStore<GlobalDataProps>();
     const currentId = route.params.id;
+    if (!store.state.posts.loadedColumns.currentId) {
+      store.state.posts.loadedColumns[currentId as string] = {
+        columnId: currentId as string,
+        currentPage: 0,
+        total: 0,
+      };
+    }
+    const total = computed(() => store.state.posts.loadedColumns[currentId as string].total);
+    const currentPage = computed(() => store.state.posts.loadedColumns[currentId as string].currentPage);
     onMounted(() => {
       store.dispatch("fetchColumn", currentId);
-      store.dispatch("fetchPosts", currentId);
+      store.dispatch("fetchPosts", {
+        cid: currentId,
+      });
     });
     const column = computed(() => {
-      const selectColumn = store.getters.getColumnById(currentId);
-      if(selectColumn) {
-        generateFitUrl(selectColumn, 100, 100);
+      const selectColumn = store.getters.getColumnById(currentId) as
+        | ColumnProps
+        | undefined;
+      if (selectColumn) {
+        addColumnAvatar(selectColumn, 100, 100);
       }
       return selectColumn;
     });
     const list = computed(() => store.getters.getPostsById(currentId));
+
+    const { loadMorePage, isLastPage } = useLoadMore("fetchColumns", total, {
+      pageSize: 6,
+      currentPage: currentPage.value ? currentPage.value + 1 : 2,
+    });
     return {
       column,
       list,
+      loadMorePage,
+      isLastPage,
     };
   },
 });

@@ -37,6 +37,14 @@
         >
           删除
         </button>
+        <model
+          @modalOnClose="modalIsVisible = false"
+          @modalOnConfirm="hideAndDelete"
+          :visible="modalIsVisible"
+          title="删除文章"
+        >
+          <p>确定要删除这篇文章吗？</p>
+        </model>
       </div>
     </article>
   </div>
@@ -51,14 +59,19 @@ import {
   GlobalDataProps,
   PostProps,
   ImageProps,
-  UserProps
+  UserProps,
+  ResponseType,
 } from "../store";
 import UserProfile from "../components/UserProfile.vue";
+import Model from "../components/Model.vue";
+import createMessage from "../hooks/useCreateMessage";
+import router from "@/router";
 
 export default defineComponent({
   name: "post-detail",
   components: {
     UserProfile,
+    Model,
   },
   setup() {
     const store = useStore<GlobalDataProps>();
@@ -80,14 +93,13 @@ export default defineComponent({
     });
     const showEditArea = computed(() => {
       const { isLogin, _id } = store.state.user;
-      if(currentPost.value && currentPost.value.author && isLogin) {
+      if (currentPost.value && currentPost.value.author && isLogin) {
         const postAuthor = currentPost.value.author as UserProps;
         return postAuthor._id === _id;
       } else {
         return false;
       }
-    })
-
+    });
 
     const currentImageUrl = computed(() => {
       if (currentPost.value && currentPost.value.image) {
@@ -97,13 +109,31 @@ export default defineComponent({
         return null;
       }
     });
-   
+
+    const hideAndDelete = () => {
+      modalIsVisible.value = false;
+      store
+        .dispatch("deletePost", currentId)
+        .then((rawData: ResponseType<PostProps>) => {
+          createMessage("删除文章成功,2秒后转跳到文章页面", "success", 2000);
+          setTimeout(() => {
+            router.push({
+              name: "column",
+              params: {
+                id: rawData.data.column,
+              },
+            });
+          }, 2000);
+        });
+    };
+
     return {
       currentPost,
       currentImageUrl,
       currentHTML,
       modalIsVisible,
-      showEditArea
+      showEditArea,
+      hideAndDelete,
     };
   },
 });

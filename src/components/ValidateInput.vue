@@ -3,18 +3,16 @@
     <input
       v-if="tag !== 'textarea'"
       class="form-control"
-      :value="inputRef.val"
       @blur="validateInput"
-      @input="updateValue"
+      v-model="inputRef.val"
       :class="{ 'is-invalid': inputRef.error }"
       :="$attrs"
     />
     <textarea
       v-else
       class="form-control"
-      :value="inputRef.val"
       @blur="validateInput"
-      @input="updateValue"
+      v-model="inputRef.val"
       :class="{ 'is-invalid': inputRef.error }"
       :="$attrs"
     />
@@ -26,6 +24,7 @@
 
 <script lang="ts">
 import {
+  computed,
   defineComponent,
   onMounted,
   PropType,
@@ -56,7 +55,12 @@ export default defineComponent({
   setup(props, context) {
     const emailReg = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
     const inputRef = reactive({
-      val: props.modelValue || "",
+      val: computed({
+        get: () => props.modelValue || "",
+        set: val => {
+          context.emit("update:modelValue", val);
+        }
+      }),
       error: false,
       errorMessage: "",
     });
@@ -97,12 +101,6 @@ export default defineComponent({
       return true;
     };
 
-    const updateValue = (e: KeyboardEvent) => {
-      const targetValue = (e.target as HTMLInputElement).value;
-      inputRef.val = targetValue;
-      context.emit("update:modelValue", targetValue);
-    };
-
     onMounted(() => {
       emitter.emit("form-item-created", validateInput);
     });
@@ -110,7 +108,6 @@ export default defineComponent({
     return {
       inputRef,
       validateInput,
-      updateValue,
     };
   },
 });
