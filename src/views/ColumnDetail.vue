@@ -30,13 +30,14 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted } from "vue";
+import { computed, defineComponent, onMounted, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 import PostList from "../components/PostList.vue";
 import { addColumnAvatar } from "../helper";
 import { GlobalDataProps, ColumnProps } from "../store";
 import useLoadMore from "../hooks/useLoadMore";
+import router from "@/router";
 
 export default defineComponent({
   name: "ColumnDetail",
@@ -47,7 +48,7 @@ export default defineComponent({
     const route = useRoute();
     const store = useStore<GlobalDataProps>();
     const currentId = route.params.id;
-    if (!store.state.posts.loadedColumns.currentId) {
+    if (!store.state.posts.loadedColumns[currentId as string]) {
       store.state.posts.loadedColumns[currentId as string] = {
         columnId: currentId as string,
         currentPage: 0,
@@ -63,9 +64,7 @@ export default defineComponent({
       });
     });
     const column = computed(() => {
-      const selectColumn = store.getters.getColumnById(currentId) as
-        | ColumnProps
-        | undefined;
+      const selectColumn = store.getters.getColumnById(currentId) as | ColumnProps | undefined;
       if (selectColumn) {
         addColumnAvatar(selectColumn, 100, 100);
       }
@@ -73,10 +72,17 @@ export default defineComponent({
     });
     const list = computed(() => store.getters.getPostsById(currentId));
 
-    const { loadMorePage, isLastPage } = useLoadMore("fetchColumns", total, {
-      pageSize: 6,
+    const { loadMorePage, isLastPage } = useLoadMore("fetchPosts", total, {
+      pageSize: 3,
       currentPage: currentPage.value ? currentPage.value + 1 : 2,
+      cid: currentId as string
     });
+
+    //解决只有参数改变，组件不刷新问题
+    watch(() => route.params.id, ()=> {
+      router.go(0);
+    })
+
     return {
       column,
       list,

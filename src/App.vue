@@ -1,6 +1,6 @@
 <template>
+<global-header :user="currentUser"></global-header>
   <div class="container">
-    <global-header :user="currentUser"></global-header>
     <loader
       v-if="isLoading"
       text="拼命加载中"
@@ -8,11 +8,11 @@
     ></loader>
     
     <router-view></router-view>
-    <footer class="text-center py-4 text-secondary bg-light mt-6">
+    <footer class="main-footer text-center py-4 text-secondary bg-light mt-6">
       <small>
         <ul class="list-inline mb-0">
           <li class="list-inline-item">@ 2020 知书达理</li>
-          <li class="list-inline-item">课程</li>
+          <li class="list-inline-item">github</li>
           <li class="list-inline-item">文档</li>
           <li class="list-inline-item">联系</li>
           <li class="list-inline-item">更多</li>
@@ -58,4 +58,9 @@ export default defineComponent({
 </script>
 
 <style>
+.main-footer {
+  font-size: 20px;
+  bottom: 0;
+}
+
 </style>

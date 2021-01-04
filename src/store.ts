@@ -183,8 +183,7 @@ const store = createStore<GlobalDataProps>({
       }
     },
     fetchPosts({ state, commit }, params) {
-      const { currentPage = 1, pageSize = 6, cid } = params;
-      console.log(params)
+      const { currentPage = 1, pageSize = 3, cid } = params;
       if(!state.posts.loadedColumns[cid] || state.posts.loadedColumns[cid].currentPage < currentPage) {
          return asyncAndCommit(`/columns/${cid}/posts?currentPage=${currentPage}&pageSize=${pageSize}`, "fetchPosts", commit, { method: "get" }, cid);
       }

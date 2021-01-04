@@ -8,6 +8,7 @@ import store from "./store";
 import axios from "axios";
 import SignUp from "./views/SignUp.vue";
 import PostDetail from "./views/PostDetail.vue";
+import EditMyData from "./views/EditMyData.vue"
 
 const routerHistory = createWebHistory();
 const router = createRouter({
@@ -45,6 +46,11 @@ const router = createRouter({
       name: "post",
       component: PostDetail,
     },
+    {
+      path: "/user",
+      name: "user",
+      component: EditMyData
+    }
   ],
 });
 

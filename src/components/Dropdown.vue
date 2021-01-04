@@ -1,36 +1,57 @@
 <template>
   <div class="dropdown">
-    <button class="btn btn-secondary dropdown-toggle" @click.prevent="btnClick">{{ title }}</button>
-    <ul class="dropdown-menu" :style="{display: 'block'}" v-if="isOpen">
-    <slot></slot>
-  </ul>
+    <button
+      class="btn btn-primary dropdown-toggle"
+      @click.prevent="btnClick"
+    >
+      {{ title }}
+    </button>
+    <ul
+      :style="{ display: 'block' }"
+      class="btn-item dropdown-menu"
+      v-if="isOpen"
+    >
+      <slot></slot>
+    </ul>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, onMounted, onUnmounted, ref } from "vue";
 
 export default defineComponent({
   name: "Dropdown",
   props: {
     title: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   setup() {
     const isOpen = ref(false);
     const btnClick = () => {
       isOpen.value = !isOpen.value;
-    }
+    };
 
+    onMounted(() => {
+      document.addEventListener("click", () => {
+        isOpen.value = false;
+      }, true)
+    });
+
+    onUnmounted(() => {
+      document.removeEventListener("click",() => {
+        isOpen.value = false;
+      }, true)
+    });
+  
     return {
       isOpen,
-      btnClick
-    }
-  }
+      btnClick,
+    };
+  },
 });
 </script>
 
-<style>
+<style scoped>
 </style>
