@@ -4,7 +4,7 @@ import router from "./router";
 import store from "./store";
 import axios from "axios";
 
-axios.defaults.baseURL = "http://localhost:8080/api/";
+axios.defaults.baseURL = process.env.NODE_ENV === "development" ? "http://localhost:8080/api/" : "http://api.vikingship.xyz/api/";
 axios.interceptors.request.use((config) => {
   store.commit("setLoading", true);
   store.commit("setError", {status: false, message: ""});
