@@ -1,7 +1,5 @@
 <template>
-  <nav
-    class="header-nav navbar bg-primary bg-primary justify-content-between"
-  >
+  <nav class="header-nav navbar bg-primary bg-primary justify-content-between">
     <router-link to="/" class="navbar-brand">知书达理</router-link>
     <ul v-if="!user.isLogin" class="navbar-btn list-inline">
       <li class="list-inline-item">
@@ -10,7 +8,9 @@
         >
       </li>
       <li class="list-inline-item">
-        <router-link to="/signup" class="btn btn-outline-light my-2">注册</router-link>
+        <router-link to="/signup" class="btn btn-outline-light my-2"
+          >注册</router-link
+        >
       </li>
     </ul>
     <ul v-else class="navbar-btn list-inline mb-0">
@@ -26,11 +26,15 @@
               >新建文章</router-link
             ></dropdown-item
           >
-          <dropdown-item
-            ><router-link to="/user" class="dropdown-item">编辑资料</router-link></dropdown-item
+          <dropdown-item :disabled="true"
+            ><router-link to="/user" class="dropdown-item"
+              >编辑资料</router-link
+            ></dropdown-item
           >
           <dropdown-item
-            ><a href="#" @click="logout" class="dropdown-item">退出登录</a></dropdown-item
+            ><a href="#" @click="logout" class="dropdown-item"
+              >退出登录</a
+            ></dropdown-item
           >
         </dropdown>
       </li>
@@ -56,16 +60,16 @@ export default defineComponent({
     Dropdown,
     DropdownItem,
   },
-  setup () {
+  setup() {
     const store = useStore();
     const logout = () => {
       store.commit("logout");
-    }
+    };
 
     return {
-      logout
-    }
-  }
+      logout,
+    };
+  },
 });
 </script>
 
@@ -81,5 +85,4 @@ export default defineComponent({
 .navbar-btn {
   margin-right: 200px;
 }
-
 </style>

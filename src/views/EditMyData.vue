@@ -8,7 +8,7 @@
       @fileUpload="handleFileUploaded"
       @fileUploadedError="onFileUploadedError"
       @updataImg="updataImg"
-      class="d-flex align-items-center justify-content-center bg-light text-secondary w-100 my-4 file-upload-container"
+      class="uploader d-flex align-items-center justify-content-center bg-light text-secondary my-4 file-upload-container"
     >
       <h2>点击上传</h2>
       <template #loading>
@@ -25,20 +25,18 @@
     </uploader>
     <validate-form @formSubmit="formSubmit">
       <div class="mb-3">
-        <label class="form-label">文章标题：</label>
         <validate-input
           :rules="titleRules"
           v-model="titleVal"
-          placeholder="请输入文章标题"
+          placeholder="请输入名称"
           type="text"
         />
       </div>
       <div class="mb-3">
-        <label class="form-label">文章详情：</label>
         <validate-input
           :rules="contentRules"
           v-model="contentVal"
-          placeholder="请输入文章详情"
+          placeholder="请输入简介信息"
           :tag="'textarea'"
           rows="10"
         />
@@ -71,10 +69,10 @@ export default defineComponent({
   },
   setup() {
     const titleRules: RuleProps = [
-      { type: "required", errorMessage: "文章标题不能为空！" },
+      { type: "required", errorMessage: "名字不能为空！" },
     ];
     const contentRules: RuleProps = [
-      { type: "required", errorMessage: "文章详情不能为空！" },
+      { type: "required", errorMessage: "简介不能为空！" },
     ];
 
     const titleVal = ref("");
@@ -85,24 +83,23 @@ export default defineComponent({
     const uploadedData = ref();
 
     onMounted(() => {
-        store
-          .dispatch("fetchPost", route.query.id)
-          .then((rawDate: ResponseType<PostProps>) => {
-            const currentPost = rawDate.data;
-            if (currentPost.image) {
-              uploadedData.value = { data: currentPost.image };
-            }
-            titleVal.value = currentPost.title;
-            contentVal.value = currentPost.content || "";
-          });
+      store
+        .dispatch("fetchPost", route.query.id)
+        .then((rawDate: ResponseType<PostProps>) => {
+          const currentPost = rawDate.data;
+          if (currentPost.image) {
+            uploadedData.value = { data: currentPost.image };
+          }
+          titleVal.value = currentPost.title;
+          contentVal.value = currentPost.content || "";
+        });
     });
 
     let imageId = "";
-    const slotProps = ref()
+    const slotProps = ref();
     const updataImg = (data: any) => {
       slotProps.value = data;
-      
-    }
+    };
     const handleFileUploaded = (rawDate: ResponseType<ImageProps>) => {
       slotProps.value = rawDate;
       if (rawDate.data._id) {
@@ -157,7 +154,6 @@ export default defineComponent({
       createMessage(`${error.message}`, "error", 2000);
     };
 
-
     return {
       titleRules,
       contentRules,
@@ -176,6 +172,11 @@ export default defineComponent({
 </script>
 
 <style>
+.create-post-page {
+  width: 60%;
+  margin-left: 50%;
+  transform: translateX(-50%);
+}
 .create-post-page .file-upload-container {
   height: 200px;
   cursor: pointer;
@@ -199,5 +200,11 @@ export default defineComponent({
   text-align: center;
   width: 100%;
   top: 50%;
+}
+.uploader {
+  width: 200px;
+  margin-left: 50%;
+  transform: translateX(-50%);
+  border-radius: 50%;
 }
 </style>
