@@ -24,7 +24,7 @@
 <script lang="ts">
 import { computed, defineComponent, PropType } from "vue";
 import { ColumnProps } from "../store";
-import {addColumnAvatar} from "../helper"
+import { addColumnAvatar } from "../helper";
 
 export default defineComponent({
   name: "ColumnList",
@@ -37,11 +37,11 @@ export default defineComponent({
   },
   setup(props) {
     const columnList = computed(() => {
-      return props.list.map(column => {
-        addColumnAvatar(column, 50, 50)
+      return props.list.map((column) => {
+        addColumnAvatar(column, 50, 50);
         return column;
-      })
-    })
+      });
+    });
 
     return {
       columnList,
@@ -51,7 +51,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.card-body img{
+.card-body img {
   width: 50px;
   height: 50px;
 }

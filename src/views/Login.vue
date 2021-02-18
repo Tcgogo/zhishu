@@ -40,7 +40,7 @@ export default defineComponent({
     ValidateForm,
   },
   setup() {
-    const emailVal = ref("111@test.com");
+    const emailVal = ref("tcgogo@qq.com");
     const passwordVal = ref("111111");
     const emailRules: RuleProps = [
       { type: "required", errorMessage: "电子邮箱地址不能为空！" },

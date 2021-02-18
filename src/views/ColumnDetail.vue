@@ -17,7 +17,7 @@
       </div>
     </div>
     <post-list v-if="list" :list="list"></post-list>
-    <div class="more-btn">
+    <div class="more-btn text-center">
       <button
         class="btn btn-outline-primary mt-2 mb-5 mx-auto btn-block w-25"
         @click="loadMorePage"
@@ -55,8 +55,12 @@ export default defineComponent({
         total: 0,
       };
     }
-    const total = computed(() => store.state.posts.loadedColumns[currentId as string].total);
-    const currentPage = computed(() => store.state.posts.loadedColumns[currentId as string].currentPage);
+    const total = computed(
+      () => store.state.posts.loadedColumns[currentId as string].total
+    );
+    const currentPage = computed(
+      () => store.state.posts.loadedColumns[currentId as string].currentPage
+    );
     onMounted(() => {
       store.dispatch("fetchColumn", currentId);
       store.dispatch("fetchPosts", {
@@ -64,7 +68,9 @@ export default defineComponent({
       });
     });
     const column = computed(() => {
-      const selectColumn = store.getters.getColumnById(currentId) as | ColumnProps | undefined;
+      const selectColumn = store.getters.getColumnById(currentId) as
+        | ColumnProps
+        | undefined;
       if (selectColumn) {
         addColumnAvatar(selectColumn, 100, 100);
       }
@@ -75,13 +81,16 @@ export default defineComponent({
     const { loadMorePage, isLastPage } = useLoadMore("fetchPosts", total, {
       pageSize: 3,
       currentPage: currentPage.value ? currentPage.value + 1 : 2,
-      cid: currentId as string
+      cid: currentId as string,
     });
 
     //解决只有参数改变，组件不刷新问题
-    watch(() => route.params.id, ()=> {
-      router.go(0);
-    })
+    watch(
+      () => route.params.id,
+      () => {
+        router.go(0);
+      }
+    );
 
     return {
       column,
@@ -93,5 +102,5 @@ export default defineComponent({
 });
 </script>
 
-<style>
+<style scoped>
 </style>

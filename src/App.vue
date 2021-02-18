@@ -1,12 +1,12 @@
 <template>
-<global-header :user="currentUser"></global-header>
+  <global-header :user="currentUser"></global-header>
   <div class="container">
     <loader
       v-if="isLoading"
       text="拼命加载中"
       background="rgba(0,0,0,.5)"
     ></loader>
-    
+
     <router-view></router-view>
     <footer class="main-footer text-center py-4 text-secondary bg-light mt-6">
       <small>
@@ -29,7 +29,7 @@ import { GlobalDataProps } from "./store";
 import "bootstrap/dist/css/bootstrap.min.css";
 import GlobalHeader from "./components/GlobalHeader.vue";
 import Loader from "./components/Loader.vue";
-import createMessage  from "./hooks/useCreateMessage";
+import createMessage from "./hooks/useCreateMessage";
 
 export default defineComponent({
   name: "App",
@@ -43,24 +43,29 @@ export default defineComponent({
     const isLoading = computed(() => store.state.loading);
     const error = computed(() => store.state.error);
 
-    watch(() => error.value.status, () => {
-      if(error.value.status && error.value.message){
-        createMessage(error.value.message, "error", 2000);
+    watch(
+      () => error.value.status,
+      () => {
+        if (error.value.status && error.value.message) {
+          createMessage(error.value.message, "error", 2000);
+        }
       }
-    })
+    );
     return {
       currentUser,
       isLoading,
-      error
+      error,
     };
   },
 });
 </script>
 
 <style>
+a {
+  text-decoration: none !important;
+}
 .main-footer {
   font-size: 20px;
   bottom: 0;
 }
-
 </style>
