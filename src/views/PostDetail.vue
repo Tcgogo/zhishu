@@ -1,6 +1,17 @@
 <template>
-  <div class="post-detail-page">
-    <article class="w-75 mx-auto mb-5 pb-3" v-if="currentPost">
+  <div v-if="currentPost" class="post-detail-page w-690">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">首页</a></li>
+        <li class="breadcrumb-item">
+          <a :href="`/column/${currentPost.column}`">专栏首页</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+          {{ currentPost.title }}
+        </li>
+      </ol>
+    </nav>
+    <article class="mb-5 pb-3">
       <img
         :src="currentImageUrl"
         alt="currentPost.title"
@@ -27,9 +38,8 @@
           type="button"
           class="btn btn-success"
           :to="{ name: 'create', query: { id: currentPost._id } }"
+          >编辑</router-link
         >
-          编辑
-        </router-link>
         <button
           type="button"
           class="btn btn-danger"
@@ -37,48 +47,49 @@
         >
           删除
         </button>
-        <model
-          @modalOnClose="modalIsVisible = false"
-          @modalOnConfirm="hideAndDelete"
-          :visible="modalIsVisible"
-          title="删除文章"
-        >
-          <p>确定要删除这篇文章吗？</p>
-        </model>
       </div>
     </article>
+    <modal
+      v-if="modalIsVisible"
+      title="删除文章"
+      :visible="modalIsVisible"
+      @modal-on-close="modalIsVisible = false"
+      @modal-on-confirm="hideAndDelete"
+    >
+      <p>确定要删除这篇文章吗？</p>
+    </modal>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, onMounted, computed, ref } from "vue";
-import MarkdownIt from "markdown-it";
+import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
-import { useRoute } from "vue-router";
+import MarkdownIt from "markdown-it";
 import {
   GlobalDataProps,
   PostProps,
   ImageProps,
   UserProps,
-  ResponseType,
-} from "../store";
+} from "../store/types";
 import UserProfile from "../components/UserProfile.vue";
-import Model from "../components/Model.vue";
-import createMessage from "../hooks/useCreateMessage";
-import router from "@/router";
+import Modal from "../base/Modal.vue";
+import createMessage from "../base/createMessage";
 
 export default defineComponent({
-  name: "post-detail",
+  name: "PostDetail",
   components: {
     UserProfile,
-    Model,
+    Modal,
   },
   setup() {
     const store = useStore<GlobalDataProps>();
+    const router = useRouter();
     const route = useRoute();
-    const modalIsVisible = ref(false);
     const currentId = route.params.id;
     const md = new MarkdownIt();
+    const modalIsVisible = ref(false);
+
     onMounted(() => {
       store.dispatch("fetchPost", currentId);
     });
@@ -91,6 +102,8 @@ export default defineComponent({
         return isHTML ? content : md.render(content);
       }
     });
+
+    // 判断文章的用户是否跟登陆用户一致
     const showEditArea = computed(() => {
       const { isLogin, _id } = store.state.user;
       if (currentPost.value && currentPost.value.author && isLogin) {
@@ -112,29 +125,35 @@ export default defineComponent({
 
     const hideAndDelete = () => {
       modalIsVisible.value = false;
-      store
-        .dispatch("deletePost", currentId)
-        .then((rawData: ResponseType<PostProps>) => {
-          createMessage("删除文章成功,2秒后转跳到文章页面", "success", 2000);
-          setTimeout(() => {
-            router.push({
-              name: "column",
-              params: {
-                id: rawData.data.column,
-              },
-            });
-          }, 2000);
-        });
+      store.dispatch("deletePost", currentId).then(() => {
+        createMessage("删除成功，2秒后跳转到专栏首页", "success", 2000);
+        setTimeout(() => {
+          router.push(`/column/${store.state.user.column}`);
+        }, 2000);
+      });
     };
 
     return {
       currentPost,
-      currentImageUrl,
       currentHTML,
-      modalIsVisible,
+      currentImageUrl,
       showEditArea,
+      modalIsVisible,
       hideAndDelete,
     };
   },
 });
 </script>
+
+<style scoped>
+.w-690 {
+  width: 690px;
+  margin: 0 auto;
+}
+.rounded-lg {
+  border-radius: 0.3rem !important;
+}
+.font-italic {
+  font-style: italic !important;
+}
+</style>

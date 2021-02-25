@@ -1,127 +1,131 @@
 <template>
-  <div class="container">
-    <validate-form @formSubmit="formSubmit">
+  <div class="signup-page mx-auto p-3 w-330">
+    <h5 class="my-4 text-center">注册者也账户</h5>
+    <validate-form @form-submit="onFormSubmit">
       <div class="mb-3">
-        <label for="exampleInputEmail1" class="form-label">邮箱地址</label>
+        <label class="form-label">邮箱地址</label>
         <validate-input
-          :rules="emailRules"
-          v-model="emailVal"
           type="text"
           placeholder="请输入邮箱地址"
+          :rules="emailRules"
+          v-model="formData.email"
         ></validate-input>
       </div>
       <div class="mb-3">
-        <label for="exampleInputEmail1" class="form-label">昵称</label>
+        <label class="form-label">昵称</label>
         <validate-input
-          :rules="nameRules"
-          v-model="nameVal"
           type="text"
           placeholder="请输入昵称"
+          :rules="nickNameRules"
+          v-model="formData.nickName"
         ></validate-input>
       </div>
       <div class="mb-3">
-        <label for="exampleInputPassword1" class="form-label">密码</label>
+        <label class="form-label">密码</label>
         <validate-input
-          :rules="passwordRules"
-          v-model="passwordVal"
           type="password"
           placeholder="请输入密码"
+          :rules="passwordRules"
+          v-model="formData.password"
         ></validate-input>
       </div>
       <div class="mb-3">
-        <label for="exampleInputPassword1" class="form-label">重复密码</label>
+        <label class="form-label">重复密码</label>
         <validate-input
-          :rules="repeatpasswordRules"
-          v-model="repeatPasswordVal"
           type="password"
-          placeholder="请重复输入密码"
+          placeholder="请再次输入密码"
+          :rules="repeatPasswordRules"
+          v-model="formData.repeatPassword"
         ></validate-input>
+        <div class="form-text">
+          <a href="/login" class="">已经有账户了？去登录</a>
+        </div>
       </div>
-      <template #submit>
-        <span class="btn btn-danger">Submit</span>
+      <template v-slot:submit>
+        <button type="submit" class="btn btn-primary btn-block btn-large">注册新用户</button>
       </template>
     </validate-form>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs } from "vue";
-import { useRouter } from "vue-router";
-// import { useStore } from "vuex";
-import axios from "axios";
-import ValidateInput, { RuleProps } from "../components/ValidateInput.vue";
-import ValidateForm from "../components/ValidateForm.vue";
-import createMessage from "../hooks/useCreateMessage";
+import { defineComponent, reactive } from 'vue'
+import { useRouter } from 'vue-router'
+import { useStore } from 'vuex'
+import ValidateInput, { RulesProps } from '../base/ValidateInput.vue'
+import ValidateForm from '../base/ValidateForm.vue'
+import createMessage from '../base/createMessage'
+
 export default defineComponent({
+  name: 'Signup',
   components: {
     ValidateInput,
-    ValidateForm,
+    ValidateForm
   },
-  setup() {
-    const router = useRouter();
-    const data = reactive({
-      emailVal: "",
-      nameVal: "",
-      passwordVal: "",
-      repeatPasswordVal: "",
-    });
-    const emailRules: RuleProps = [
-      { type: "required", errorMessage: "电子邮箱地址不能为空！" },
-      { type: "email", errorMessage: "请输入正确的电子邮箱格式！" },
-    ];
-    const nameRules: RuleProps = [
-      { type: "required", errorMessage: "名字不能为空！" },
-      { type: "name", errorMessage: "名字不能少于3位！" },
-    ];
-    const passwordRules: RuleProps = [
-      { type: "required", errorMessage: "电子邮箱地址不能为空！" },
-      { type: "password", errorMessage: "密码不能小于6位！" },
-    ];
-    const repeatpasswordRules: RuleProps = [
-      { type: "required", errorMessage: "电子邮箱地址不能为空！" },
-      { type: "password", errorMessage: "密码不能小于6位！" },
+  setup () {
+    const formData = reactive({
+      email: '',
+      nickName: '',
+      password: '',
+      repeatPassword: ''
+    })
+    const emailRules: RulesProps = [
+      { type: 'required', message: '电子邮箱地址不能为空' },
+      { type: 'email', message: '请输入正确的电子邮箱格式' }
+    ]
+    const nickNameRules: RulesProps = [
+      { type: 'required', message: '昵称不能为空' }
+    ]
+    const passwordRules: RulesProps = [
+      { type: 'required', message: '密码不能为空' }
+    ]
+    const repeatPasswordRules: RulesProps = [
+      { type: 'required', message: '重复密码不能为空' },
       {
-        type: "custom",
-        validator: () => data.passwordVal === data.repeatPasswordVal,
-        errorMessage: "两次输入密码不一致！",
-      },
-    ];
-
-    const formSubmit = (res: boolean) => {
-      if (res) {
-        const payload = {
-          email: data.emailVal,
-          password: data.passwordVal,
-          nickName: data.nameVal,
-        };
-
-        axios
-          .post("/users", payload)
-          .then(() => {
-            createMessage("注册成功 正在转跳到登录页面", "success", 2000);
-            setTimeout(() => {
-              router.push("/login");
-            }, 2000);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+        type: 'custom',
+        validator: () => { return formData.password === formData.repeatPassword },
+        message: '两次密码不相同'
       }
-    };
+    ]
 
-    const signUpData = toRefs(data);
+    const router = useRouter()
+    const store = useStore()
+
+    const onFormSubmit = (result: boolean) => {
+      if (result) {
+        const payload = {
+          email: formData.email,
+          password: formData.password,
+          nickName: formData.nickName
+        }
+        store.dispatch('register', payload).then(() => {
+          createMessage('注册成功 正在跳转登录页面', 'success')
+          setTimeout(() => {
+            router.push('/login')
+          }, 1000)
+        }).catch(e => {
+          console.log(e)
+        })
+      }
+    }
 
     return {
-      ...signUpData,
+      formData,
       emailRules,
-      nameRules,
+      nickNameRules,
       passwordRules,
-      repeatpasswordRules,
-      formSubmit,
-    };
-  },
-});
+      repeatPasswordRules,
+      onFormSubmit
+    }
+  }
+})
 </script>
-
-<style>
+<style scoped>
+.w-330 {
+  max-width: 330px;
+}
+.btn-block{
+  width: 100%;
+  display: block;
+}
 </style>

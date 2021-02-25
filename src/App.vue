@@ -1,35 +1,34 @@
 <template>
-  <global-header :user="currentUser"></global-header>
-  <div class="container">
+  <div class="container-fluid px-0 flex-shrink-0">
+    <global-header :user="currentUser"></global-header>
+    <router-view></router-view>
     <loader
       v-if="isLoading"
       text="拼命加载中"
-      background="rgba(0,0,0,.5)"
+      background="rgba(0, 0, 0, 0.8)"
     ></loader>
-
-    <router-view></router-view>
-    <footer class="main-footer text-center py-4 text-secondary bg-light mt-6">
-      <small>
-        <ul class="list-inline mb-0">
-          <li class="list-inline-item">@ 2020 知书达理</li>
-          <li class="list-inline-item">github</li>
-          <li class="list-inline-item">文档</li>
-          <li class="list-inline-item">联系</li>
-          <li class="list-inline-item">更多</li>
-        </ul>
-      </small>
-    </footer>
   </div>
+  <footer class="text-center py-4 text-secondary bg-light mt-auto footer">
+    <small>
+      <ul class="list-inline mb-0">
+        <li class="list-inline-item">© 2020 者也专栏</li>
+        <li class="list-inline-item">课程</li>
+        <li class="list-inline-item">文档</li>
+        <li class="list-inline-item">联系</li>
+        <li class="list-inline-item">更多</li>
+      </ul>
+    </small>
+  </footer>
 </template>
 
 <script lang="ts">
 import { defineComponent, computed, watch } from "vue";
 import { useStore } from "vuex";
-import { GlobalDataProps } from "./store";
+import { GlobalDataProps } from "./store/types";
 import "bootstrap/dist/css/bootstrap.min.css";
 import GlobalHeader from "./components/GlobalHeader.vue";
-import Loader from "./components/Loader.vue";
-import createMessage from "./hooks/useCreateMessage";
+import Loader from "./base/Loader.vue";
+import createMessage from "./base/createMessage";
 
 export default defineComponent({
   name: "App",
@@ -43,14 +42,17 @@ export default defineComponent({
     const isLoading = computed(() => store.state.loading);
     const error = computed(() => store.state.error);
 
+    // watch 可以接收一个 getters
     watch(
       () => error.value.status,
       () => {
-        if (error.value.status && error.value.message) {
-          createMessage(error.value.message, "error", 2000);
+        const { status, message } = error.value;
+        if (status && message) {
+          createMessage(message, "error");
         }
       }
     );
+
     return {
       currentUser,
       isLoading,
@@ -61,11 +63,11 @@ export default defineComponent({
 </script>
 
 <style>
-a {
-  text-decoration: none !important;
+#app {
+  min-height: 100vh;
 }
-.main-footer {
-  font-size: 20px;
-  bottom: 0;
+.footer {
+  position: relative;
+  bottom: -70vh;
 }
 </style>
