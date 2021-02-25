@@ -46,12 +46,12 @@ export default defineComponent({
     ValidateForm,
   },
   setup() {
-    const emailVal = ref("");
+    const emailVal = ref("tcgogo@qq.com");
     const emailRules: RulesProps = [
       { type: "required", message: "电子邮箱地址不能为空" },
       { type: "email", message: "请输入正确的电子邮箱格式" },
     ];
-    const passwordVal = ref("");
+    const passwordVal = ref("111111");
     const passwordRules: RulesProps = [
       { type: "required", message: "密码不能为空" },
     ];
